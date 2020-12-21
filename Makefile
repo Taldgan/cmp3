@@ -1,12 +1,29 @@
-driver: obj/*.o
-	gcc $(inputs) -o driver	
-	mv driver bin/driver
-obj/%.o: src/%.c
-	gcc -c $(input)
-	mv $(output) obj/$(output)
+SRCDIR := src
+OBJDIR := obj
+BINDIR := bin
+DEBUGFLAGS := -ggdb
 
-.PHONY: clean
+OBJECTS := $(OBJDIR)/songlist.o $(OBJDIR)/files.o $(OBJDIR)/driver.o $(OBJDIR)/menu.o
+
+run: all
+	./$(BINDIR)/driver
+
+all: $(BINDIR)/driver
+
+$(BINDIR)/driver: $(OBJECTS)
+	gcc $(OBJDIR)/*.o -o driver
+	mv driver $(BINDIR)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	gcc -c $(DEBUGFLAGS) $<
+	mv *.o $(OBJDIR)
+
+.PHONY: clean all run debug
+
+debug: $(OBJECTS)
+	gcc $(OBJDIR)/*.o -ggdb -o driver
+	mv driver $(BINDIR)
 
 clean:
-	rm bin/*
-	rm obj/*
+	rm -f ./bin/*
+	rm -f ./obj/*

@@ -3,7 +3,6 @@
 // C file containing functions to create and interact with a 'song'/'playlist' data structure
 
 #include <stdio.h>
-#include "menu.h"
 #include "files.h"
 
 /*
@@ -34,7 +33,7 @@ typedef struct playlist {
 /*
  * -skip-
  * Skip forward or backward in the playlist
- * playlistT plist - playlist datastructure being used
+ * playlistT *plist - pointer to playlist data structure being used
  * int forward - boolean determining forward(0) or back(1)
  */
 

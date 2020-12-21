@@ -1,0 +1,11 @@
++++TODO+++
+
+- Fix/Alter 'menu.c' to allow for a collection of 'menu' objects
+- Add capability to 'add' menus to the list
+- Integrate 'menu' w/ playlist
+- add interaction to the menu...?
+
+- start files.c
+
+
+- Rework like 99% of the list based data structures to be dynamic using malloc/realloc
