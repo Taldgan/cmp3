@@ -1,4 +1,4 @@
-#CMP3 Player
-
-##How does one make a title?
-It is unknown
+# CMP3 Player
+## An MP3 player written in C...
+### About
+Not much to say yet... :P
