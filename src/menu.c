@@ -16,7 +16,7 @@
  */
 
 typedef struct menu{
-	int numOptions;
+	int numOptions, maxOptions;
 	char **options;
 	char *title;
 } menuT;
@@ -31,15 +31,18 @@ typedef struct menu{
 typedef struct menulist{
 	int numMenus;
 	char *menuType;
-	menuT *menus;
+	menuT **menus;
 } menulistT;
 
 
 //Function declarations
-
 void freeMenus(menulistT *list);
-void printBanner(menuT *menu);
+void freeMenu(menuT *menu);
+void printMenu(menuT *menu);
 menuT *initMenu(char *t, char **ops, int numOp);
+void addOption(menuT *menu, char *entry);
+
+menulistT *initMenuList(char *t, char **menus, //add to);
 
 /**
  * -initMenu-
@@ -61,19 +64,46 @@ menuT *initMenu(char *t, char **ops, int numOp){
 	else{
 		newMenu->numOptions = numOp;
 	}
-	newMenu->options = calloc(newMenu->numOptions, sizeof(char*));
+	newMenu->maxOptions = (newMenu->numOptions*2);
+	newMenu->options = calloc(newMenu->maxOptions, sizeof(char*));
 	for(i = 0; i < newMenu->numOptions; i++){
 		newMenu->options[i] = malloc((strlen(ops[i])+1));	//Allocate space for string
 		strcpy(newMenu->options[i], ops[i]);							//Copy string over using strcpy
 	}
 	return newMenu;
 }
+/**
+ * -addOption-
+ *  Adds an option to an existing menu, reallocating the options array if necessary.
+ *  **Note: Each resize doubles the capacity of the memory to 2n
+ *  menuT *menu - the menu that an option is being added to
+ *  char *entry - the option being added
+ *	return void
+ */
+
+void addOption(menuT *menu, char *entry){
+	if(!menu)
+		return;
+	if(!entry)
+		return;
+	if(menu->numOptions == menu->maxOptions){
+		menu->maxOptions *= 2;
+		menu->options = reallocarray(menu->options, menu->maxOptions, sizeof(char *));
+		//TODO: add reallocarray() here for menu->options expansion
+	}
+	menu->options[menu->numOptions] = malloc(strlen(entry)+1);
+	strcpy(menu->options[menu->numOptions++], entry);
+}
 
 /**
  * -printMenu-
- * Prints a bannerLen based off of the title and contents of the menu struct.		-----				 -------------
- * Note: If title exceeds assigned banner length, the result is a cut off title: 	CUT O, as opposed to ===CUT OFF===
- *																					-----				 -------------
+ * Prints a bannerLen based off of the title and contents of the menu struct.		
+ * **Note: If title exceeds assigned banner length, the result is a cut off title: 	
+ *
+ *		-----				 -------------																				
+ *		CUT O, as opposed to ===CUT OFF===
+ *		-----				 -------------
+ *
  *	menuT menu - Pointer to the menu object, printMenu prints contents of this object
  *	return void
  */
@@ -124,5 +154,10 @@ void printMenu(menuT *menu){
  */
 
 void freeMenu(menuT *menu){
+	int i;
+	for(i = 0; i < menu->numOptions; i++){
+		free(menu->options[i]);				//Clear out strings
+	}
+	free(menu->options);					//Clear out string array
 	free(menu);
 }

@@ -14,5 +14,8 @@ int main(int argc, char *argv[]){
 	testMenu = initMenu(title, options, 0); 
 	printf("Title: %s\nOption 1: %s\n Option 2: %s\n", testMenu->title, testMenu->options[0], testMenu->options[1]);
 	printMenu(testMenu);
+	addOption(testMenu, "Op 3333");
+	printMenu(testMenu);
+	freeMenu(testMenu);
 	return 0;
 }

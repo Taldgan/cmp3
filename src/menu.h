@@ -1,16 +1,25 @@
 #ifndef MENU_H
 #define MENU_H
 
-#define bannerLen 90
+#define bannerLen 40
 
 typedef struct menu{
-	int numOptions;
+	int numOptions, maxOptions;
 	char **options;
 	char *title;
 } menuT;
 
-menuT *initMenu(char *t, char **ops, int numOptions);
-void printMenu(menuT *menu);
+typedef struct menulist{
+	int numMenus;
+	char *menuType;
+	menuT **menus;
+} menulistT;
+
+
+void freeMenus(menulistT *list);
 void freeMenu(menuT *menu);
+void printMenu(menuT *menu);
+menuT *initMenu(char *t, char **ops, int numOp);
+void addOption(menuT *menu, char *entry);
 
 #endif
