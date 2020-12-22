@@ -6,9 +6,20 @@
 
 #define MIN_LIST 2
 #define MIN_OPTION 2
-#define bannerLen 90
+#define bannerLen 40
 
+/*
+ * Menu struct
+ * int numOptions - keeps track of the number of menu options available
+ * char **options - dynamic string array of the options the menu contains
+ * char *title - title of the menu for banner printing
+ */
 
+typedef struct menu{
+	int numOptions;
+	char **options;
+	char *title;
+} menuT;
 
 /**
  * Menu list struct, holds a collection of similar menus
@@ -23,24 +34,12 @@ typedef struct menulist{
 	menuT *menus;
 } menulistT;
 
-/*
- * Menu struct
- * int numOptions - keeps track of the number of menu options available
- * char **options - string array of the options the menu contains
- * char *title - title of the menu for banner printing
- */
-
-typedef struct menu{
-	int numOptions;
-	char **options;
-	char *title;
-} menuT;
 
 //Function declarations
 
 void freeMenus(menulistT *list);
 void printBanner(menuT *menu);
-
+menuT *initMenu(char *t, char **ops, int numOp);
 
 /**
  * -initMenu-
@@ -51,9 +50,10 @@ void printBanner(menuT *menu);
  *  return menuT - returns the newly created menu object
  */
 
-menuT *initMenu(char *t, char** ops, int numOp){
-	menuT *newMenu = (menuT *) malloc(sizeof(menuT));
+menuT *initMenu(char *t, char **ops, int numOp){
+	menuT *newMenu = malloc(sizeof(menuT));
 	newMenu->title = t;
+	newMenu->options = NULL;
 	int i;
 	if(numOp < MIN_OPTION){
 		newMenu->numOptions = MIN_OPTION;
@@ -61,15 +61,10 @@ menuT *initMenu(char *t, char** ops, int numOp){
 	else{
 		newMenu->numOptions = numOp;
 	}
-	newMenu->options = (char *) malloc(sizeof(char*)*numOptions);
-	newMenu->numOptions = 0;
+	newMenu->options = calloc(newMenu->numOptions, sizeof(char*));
 	for(i = 0; i < newMenu->numOptions; i++){
-		if(ops[i]){
-			
-		}
-		else{
-			break;
-		}
+		newMenu->options[i] = malloc((strlen(ops[i])+1));	//Allocate space for string
+		strcpy(newMenu->options[i], ops[i]);							//Copy string over using strcpy
 	}
 	return newMenu;
 }
