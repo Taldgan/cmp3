@@ -5,7 +5,7 @@
 //C file to gather user input and do various 'menu' related tasks
 
 #define MIN_LIST 2
-#define MIN_OPTION 2
+#define MIN_OPTION 1
 #define bannerLen 40
 
 /*
@@ -16,7 +16,7 @@
  */
 
 typedef struct menu{
-	int numOptions, maxOptions;
+	int numOptions, capacity;
 	char **options;
 	char *title;
 } menuT;
@@ -29,20 +29,41 @@ typedef struct menu{
  */
 
 typedef struct menulist{
-	int numMenus;
+	int numMenus, capacity;
 	char *menuType;
 	menuT **menus;
 } menulistT;
 
 
 //Function declarations
-void freeMenus(menulistT *list);
+void freeMenuList(menulistT *list);
 void freeMenu(menuT *menu);
 void printMenu(menuT *menu);
-menuT *initMenu(char *t, char **ops, int numOp);
+menuT *initMenu(char *t, char **opsa, int numOp);
+menulistT *initMenuList(char *t, menuT **pmenus, int pnumMenus);
 void addOption(menuT *menu, char *entry);
+void printMenuList(menulistT *list);
 
-menulistT *initMenuList(char *t, char **menus, //add to);
+menulistT *initMenuList(char *t, menuT **pmenus, int pnumMenus){
+	if(!pmenus)
+		return NULL;
+	if(pnumMenus < MIN_LIST)
+		return NULL;
+
+	int i;
+	menulistT *newList = malloc(sizeof(menulistT));
+
+	newList->menuType = t;
+	newList->numMenus = pnumMenus;
+	newList->capacity = (newList->numMenus*2);
+	newList->menus = calloc((newList->capacity), sizeof(menuT *));	
+	for(i = 0; i < newList->numMenus; i++){
+		newList->menus[i] = malloc(sizeof(menuT));
+		newList->menus[i] = pmenus[i];
+		//memcpy(newList->menus[i], pmenus[i], sizeof(menuT));
+	}
+	return newList;
+}
 
 /**
  * -initMenu-
@@ -54,20 +75,23 @@ menulistT *initMenuList(char *t, char **menus, //add to);
  */
 
 menuT *initMenu(char *t, char **ops, int numOp){
-	menuT *newMenu = malloc(sizeof(menuT));
-	newMenu->title = t;
-	newMenu->options = NULL;
-	int i;
+	if(!ops)
+		return NULL;
 	if(numOp < MIN_OPTION){
-		newMenu->numOptions = MIN_OPTION;
+		return NULL;
 	}
-	else{
-		newMenu->numOptions = numOp;
-	}
-	newMenu->maxOptions = (newMenu->numOptions*2);
-	newMenu->options = calloc(newMenu->maxOptions, sizeof(char*));
+
+	int i;
+	menuT *newMenu = malloc(sizeof(menuT));
+
+	newMenu->title = t;
+	newMenu->numOptions = numOp;
+	newMenu->capacity = (newMenu->numOptions*2);
+	newMenu->options = NULL;
+	newMenu->options = calloc(newMenu->capacity, sizeof(char*));
+
 	for(i = 0; i < newMenu->numOptions; i++){
-		newMenu->options[i] = malloc((strlen(ops[i])+1));	//Allocate space for string
+		newMenu->options[i] = malloc((strlen(ops[i])+1));				//Allocate space for string
 		strcpy(newMenu->options[i], ops[i]);							//Copy string over using strcpy
 	}
 	return newMenu;
@@ -86,18 +110,31 @@ void addOption(menuT *menu, char *entry){
 		return;
 	if(!entry)
 		return;
-	if(menu->numOptions == menu->maxOptions){
-		menu->maxOptions *= 2;
-		menu->options = reallocarray(menu->options, menu->maxOptions, sizeof(char *));
-		//TODO: add reallocarray() here for menu->options expansion
+	if(menu->numOptions == menu->capacity){
+		menu->capacity *= 2;
+		menu->options = reallocarray(menu->options, menu->capacity, sizeof(char *));
 	}
 	menu->options[menu->numOptions] = malloc(strlen(entry)+1);
 	strcpy(menu->options[menu->numOptions++], entry);
 }
 
 /**
+ * -printMenuList-
+ * Prints every menu in the menulist
+ * menulistT *list - the menulist being printed
+ * return void
+ */
+
+void printMenuList(menulistT *list){
+	int i;
+	for(i = 0; i < list->numMenus; i++){
+		printMenu(list->menus[i]);
+	}
+}
+
+/**
  * -printMenu-
- * Prints a bannerLen based off of the title and contents of the menu struct.		
+ * Prints a banner based off of the title and contents of the menu struct.		
  * **Note: If title exceeds assigned banner length, the result is a cut off title: 	
  *
  *		-----				 -------------																				
@@ -147,8 +184,23 @@ void printMenu(menuT *menu){
 }
 
 /**
+ * -freeMenuList-
+ *  Free's menulist struct
+ *  menulistT *list - the menulist struct being freed
+ *  return void
+ */
+
+void freeMenuList(menulistT *list){
+	int i;
+	for(i = 0; i < list->numMenus; i++){
+		freeMenu(list->menus[i]);
+	}
+	free(list);
+}
+
+/**
  * -freeMenu-
- *  Free's menu object
+ *  Free's menu struct
  *  menuT *menu - the menu struct being freed
  *  return void
  */

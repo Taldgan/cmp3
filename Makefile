@@ -3,14 +3,14 @@ OBJDIR := obj
 BINDIR := bin
 DEBUGFLAGS := -ggdb
 
-OBJECTS := $(OBJDIR)/songlist.o $(OBJDIR)/files.o $(OBJDIR)/driver.o $(OBJDIR)/menu.o
+OBJECTS := $(OBJDIR)/songlist.o $(OBJDIR)/files.o $(OBJDIR)/test.o $(OBJDIR)/menu.o
 
 run: all
 	./$(BINDIR)/driver
 
-all: $(BINDIR)/driver
+all: $(BINDIR)/test
 
-$(BINDIR)/driver: $(OBJECTS)
+$(BINDIR)/test: $(OBJECTS)
 	gcc $(OBJDIR)/*.o -o driver
 	mv driver $(BINDIR)
 
